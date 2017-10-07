@@ -29,7 +29,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="facialdetect.cpp">
+    <ClCompile Include="main_rewrite.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
