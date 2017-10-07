@@ -9,42 +9,60 @@ using std::vector;
 using std::runtime_error;
 using std::string;
 bool isLoop = true;
-string FACE_CASCADE_FILE = "D:\\opencv\\build\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
-
-void FaceDetection_fun(cv::CascadeClassifier cc,Mat &raw)
+string FACE_CASCADE_FILE = "G:\\opencv3\\opencv\\build\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
+string EYE_CASCADE_FILE = "G:\\opencv3\\opencv\\build\\etc\\haarcascades\\haarcascade_eye.xml";
+vector<cv::Rect> FaceDetection_fun(cv::CascadeClassifier cc,Mat &raw,Mat &face)
 {
-	vector<cv::Rect> result;
+	vector<cv::Rect> *result = new vector<cv::Rect>;
 	Mat temp;
 	cv::cvtColor(raw, temp, cv::COLOR_RGB2GRAY);
-	cc.detectMultiScale(temp, result);
-	for (auto r : result)
-		cv::rectangle(raw, r, cv::Scalar(0, 255, 255));
+	cc.detectMultiScale(temp, *result);
+
+	for (auto r : *result)
+		cv::rectangle(raw, r, cv::Scalar(255, 0, 255));
+	//if(!result.empty()) face = raw(result[0]);
+	return *result;
 }
 
+vector<cv::Rect> EyeDetection_fun(cv::CascadeClassifier cc, Mat &raw, Mat &face)
+{
+	vector<cv::Rect> *result = new vector<cv::Rect>;
+	Mat temp;
+	cv::cvtColor(raw, temp, cv::COLOR_RGB2GRAY);
+	cc.detectMultiScale(temp, *result);
+
+	for (auto r : *result)
+		cv::rectangle(raw, r, cv::Scalar(0, 0, 255));
+	return *result;
+}
 int main()
 {
 	VideoCapture cap(0);
 	if (!cap.isOpened()) throw runtime_error("invaid camera");
-	
-	else
-	{
 		cap.set(cv::CAP_PROP_FPS, 30);
 		cap.set(cv::CAP_PROP_FRAME_WIDTH, 400);
 		cap.set(cv::CAP_PROP_FRAME_HEIGHT, 320);
-		Mat frame;
-		namedWindow("实时视频");
 
+
+		Mat frame,face;
+		namedWindow("实时视频");
+		namedWindow("面部画面");
 		cv::CascadeClassifier face_detection;
 		face_detection.load(FACE_CASCADE_FILE);
+		cv::CascadeClassifier eye_detection;
+		eye_detection.load(EYE_CASCADE_FILE);
 
 		while (isLoop)
 		{
 			cap>>frame;
-			FaceDetection_fun(face_detection,frame);
+			vector<cv::Rect> faceVector = FaceDetection_fun(face_detection,frame,face);
+			vector<cv::Rect> eyeVector = EyeDetection_fun(eye_detection, frame, face);
 			imshow("实时视频", frame);
+			if ((faceVector.size() == 1) && (eyeVector.size() == 2))
+				if (((eyeVector[0].y - eyeVector[1].y)<10)|| ((eyeVector[1].y - eyeVector[0].y)<10))
+					imshow("面部画面", frame);
 			waitKey(1);
 		}
 		return 0;
-	}
 }
 
