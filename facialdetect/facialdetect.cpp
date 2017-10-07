@@ -14,23 +14,16 @@ string EYE_CASCADE_FILE = "G:\\opencv3\\opencv\\build\\etc\\haarcascades\\haarca
 vector<cv::Rect> FaceDetection_fun(cv::CascadeClassifier cc,Mat &raw,Mat &face)
 {
 	vector<cv::Rect> *result = new vector<cv::Rect>;
-	Mat temp;
-	cv::cvtColor(raw, temp, cv::COLOR_RGB2GRAY);
-	cc.detectMultiScale(temp, *result);
-
+	cc.detectMultiScale(raw, *result);
 	for (auto r : *result)
 		cv::rectangle(raw, r, cv::Scalar(255, 0, 255));
-	//if(!result.empty()) face = raw(result[0]);
 	return *result;
 }
 
 vector<cv::Rect> EyeDetection_fun(cv::CascadeClassifier cc, Mat &raw, Mat &face)
 {
 	vector<cv::Rect> *result = new vector<cv::Rect>;
-	Mat temp;
-	cv::cvtColor(raw, temp, cv::COLOR_RGB2GRAY);
-	cc.detectMultiScale(temp, *result);
-
+	cc.detectMultiScale(raw, *result);
 	for (auto r : *result)
 		cv::rectangle(raw, r, cv::Scalar(0, 0, 255));
 	return *result;
@@ -43,7 +36,6 @@ int main()
 		cap.set(cv::CAP_PROP_FRAME_WIDTH, 400);
 		cap.set(cv::CAP_PROP_FRAME_HEIGHT, 320);
 
-
 		Mat frame,face;
 		namedWindow("实时视频");
 		namedWindow("面部画面");
@@ -54,7 +46,9 @@ int main()
 
 		while (isLoop)
 		{
-			cap>>frame;
+			Mat temp;
+			cap>>temp;
+			cv::cvtColor(temp, frame, cv::COLOR_RGB2GRAY);
 			vector<cv::Rect> faceVector = FaceDetection_fun(face_detection,frame,face);
 			vector<cv::Rect> eyeVector = EyeDetection_fun(eye_detection, frame, face);
 			imshow("实时视频", frame);
