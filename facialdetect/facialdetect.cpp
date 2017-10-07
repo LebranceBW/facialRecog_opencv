@@ -9,8 +9,8 @@ using std::vector;
 using std::runtime_error;
 using std::string;
 bool isLoop = true;
-string FACE_CASCADE_FILE = "G:\\opencv3\\opencv\\build\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
-string EYE_CASCADE_FILE = "G:\\opencv3\\opencv\\build\\etc\\haarcascades\\haarcascade_eye.xml";
+string FACE_CASCADE_FILE = "D:\\OpencvSDK\\build\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
+string EYE_CASCADE_FILE = "D:\\OpencvSDK\\build\\etc\\haarcascades\\haarcascade_eye.xml";
 vector<cv::Rect> FaceDetection_fun(cv::CascadeClassifier cc,Mat &raw,Mat &face)
 {
 	vector<cv::Rect> *result = new vector<cv::Rect>;
@@ -33,8 +33,8 @@ int main()
 	VideoCapture cap(0);
 	if (!cap.isOpened()) throw runtime_error("invaid camera");
 		cap.set(cv::CAP_PROP_FPS, 30);
-		cap.set(cv::CAP_PROP_FRAME_WIDTH, 400);
-		cap.set(cv::CAP_PROP_FRAME_HEIGHT, 320);
+		cap.set(cv::CAP_PROP_FRAME_WIDTH, 800);
+		cap.set(cv::CAP_PROP_FRAME_HEIGHT, 600);
 
 		Mat frame,face;
 		namedWindow(" µ ± ”∆µ");
