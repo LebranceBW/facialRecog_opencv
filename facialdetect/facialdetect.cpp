@@ -8,7 +8,6 @@ using cv::VideoCapture;
 using std::vector;
 using std::runtime_error;
 using std::string;
-
 bool isLoop = true;
 string FACE_CASCADE_FILE = "D:\\opencv\\build\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
 
@@ -26,8 +25,12 @@ int main()
 {
 	VideoCapture cap(0);
 	if (!cap.isOpened()) throw runtime_error("invaid camera");
+	
 	else
 	{
+		cap.set(cv::CAP_PROP_FPS, 30);
+		cap.set(cv::CAP_PROP_FRAME_WIDTH, 400);
+		cap.set(cv::CAP_PROP_FRAME_HEIGHT, 320);
 		Mat frame;
 		namedWindow("实时视频");
 
@@ -39,8 +42,7 @@ int main()
 			cap>>frame;
 			FaceDetection_fun(face_detection,frame);
 			imshow("实时视频", frame);
-			if(-1!=waitKey(1))
-				isLoop = false;
+			waitKey(1);
 		}
 		return 0;
 	}
