@@ -4,7 +4,7 @@ using cv::VideoCapture;
 using cv::CascadeClassifier;
 using std::vector;
 using cv::Rect;
-
+using cv::selectROI;
 const std::string FACE_CASCADE_PATH = "D:\\OpencvSDK\\build\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
 const std::string EYE_CASCADE_PATH = "D:\\OpencvSDK\\build\\etc\\haarcascades\\haarcascade_eye.xml";
 
@@ -47,8 +47,15 @@ int main()
 	{
 		camera >> rawFrame;
 		cv::cvtColor(rawFrame, grayFrame, cv::COLOR_RGB2GRAY);
-		cv::imshow("实时视频", grayFrame);
-		cv::imshow("抓取到的内容", FaceEyeDetection(grayFrame, faceVector, eyeVector));
+		cv::imshow("实时视频", FaceEyeDetection(grayFrame, faceVector, eyeVector));
+		if((faceVector.size() == 1)&&(eyeVector.size() == 2))
+			if (((eyeVector[0].y - eyeVector[1].y) <= 5) || ((eyeVector[1].y - eyeVector[0].y) <= 5))
+			{
+				Mat p = (Mat(grayFrame, faceVector[0])).clone();
+				cv::imshow("抓取到的内容", p);
+			}
 		if (-1 != cv::waitKey(1)) break;
+
 	}
+	return 0;
 }
