@@ -13,6 +13,6 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <tchar.h>
-#include <thread>
+#include <cmath>  
 #include <opencv2\opencv.hpp>
 #include <opencv2\imgproc\imgproc.hpp>

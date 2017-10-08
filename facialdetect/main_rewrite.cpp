@@ -16,8 +16,8 @@ VideoCapture CameraInit()
 	else
 	{
 		cap->set(cv::CAP_PROP_FPS, 30);
-		cap->set(cv::CAP_PROP_FRAME_WIDTH, 800);
-		cap->set(cv::CAP_PROP_FRAME_HEIGHT, 600);
+		cap->set(cv::CAP_PROP_FRAME_WIDTH, 400);
+		cap->set(cv::CAP_PROP_FRAME_HEIGHT, 300);
 	}
 	return *cap;
 }
@@ -36,11 +36,12 @@ Mat FaceEyeDetection(const Mat frame,vector<Rect> &face,vector<Rect> &eye)
 int main()
 {
 	VideoCapture camera = CameraInit(); //初始化并设置摄像头
-
+	bool flag = true;
 	Mat rawFrame, grayFrame;
 	vector<Rect> faceVector, eyeVector;
 	cv::namedWindow("实时视频");
-	cv::namedWindow("抓取到的内容");
+	cv::namedWindow("旋转后的内容");
+	cv::namedWindow("面部内容");
 	faceCC.load(FACE_CASCADE_PATH);
 	eyeCC.load(EYE_CASCADE_PATH);
 	while (true)
@@ -48,11 +49,30 @@ int main()
 		camera >> rawFrame;
 		cv::cvtColor(rawFrame, grayFrame, cv::COLOR_RGB2GRAY);
 		cv::imshow("实时视频", FaceEyeDetection(grayFrame, faceVector, eyeVector));
-		if((faceVector.size() == 1)&&(eyeVector.size() == 2))
-			if (((eyeVector[0].y - eyeVector[1].y) <= 5) || ((eyeVector[1].y - eyeVector[0].y) <= 5))
+		if(flag&&(faceVector.size() == 1)&&(eyeVector.size() == 2))
+			if (((eyeVector[0].y - eyeVector[1].y) <= 15) || ((eyeVector[1].y - eyeVector[0].y) <= 15))
 			{
-				Mat p = (Mat(grayFrame, faceVector[0])).clone();
-				cv::imshow("抓取到的内容", p);
+				Mat raw = (Mat(grayFrame, faceVector[0])).clone();
+				//flag = false;
+				Mat rotate;
+				
+				//const int ANGLE = 30;
+				const double SCALE = 1.1;
+				int length = sqrt(raw.cols*raw.cols + raw.rows*raw.rows) * SCALE;
+				Mat tempMat(length, length, raw.type());
+				Rect ROIRect((length / 2 - raw.cols / 2), (length / 2 - raw.cols / 2), raw.cols, raw.rows);
+				Mat temp2Mat(tempMat, ROIRect);
+				raw.copyTo(temp2Mat);
+				cv::Point2f center(length / 2, length / 2);
+
+				double angle = atan((double)(eyeVector[0].y - eyeVector[1].y) / (eyeVector[0].x - eyeVector[1].x)) * 180 / CV_PI;
+
+				Mat transfromeMat = cv::getRotationMatrix2D(center, angle, SCALE);
+				cv::warpAffine(tempMat,rotate,transfromeMat,cv::Size(length,length));
+			
+				
+				cv::imshow("面部内容", raw);
+				cv::imshow("旋转后的内容",rotate);
 			}
 		if (-1 != cv::waitKey(1)) break;
 
